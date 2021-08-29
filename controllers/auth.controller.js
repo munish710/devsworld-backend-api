@@ -34,7 +34,7 @@ const login = async (req, res) => {
   if (!email || !password) {
     throw new BadRequestError("Please provide email and password");
   }
-  console.log(email, password);
+
   email = email.toLowerCase();
   let foundUser = await User.findOne({ email });
   if (!foundUser) {
