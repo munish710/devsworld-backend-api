@@ -7,9 +7,13 @@ const connectDB = require("./db/db.connect");
 const errorHandlerMiddleware = require("./middleware/error-handler.middleware");
 const notFoundMiddleware = require("./middleware/not-found.middleware");
 
+const authRouter = require("./routes/auth.router");
+
 app.get("/", (req, res) => {
   res.send("Welcome to Social-Media-Backend-API");
 });
+
+app.use("/api/v1/auth", authRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
