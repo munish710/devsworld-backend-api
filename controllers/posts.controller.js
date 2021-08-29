@@ -1,6 +1,16 @@
 const { BadRequestError } = require("../errors");
 const Post = require("../models/post.model");
 
+const getAllPosts = async (req, res) => {
+  const allPosts = await Post.find().populate({
+    path: "postedBy",
+    select: "_id name username",
+  });
+  res
+    .status(200)
+    .json({ success: true, message: "All posts", posts: allPosts });
+};
+
 const createPost = async (req, res) => {
   const { title, body } = req.body;
   if (!title || !body) {
@@ -15,4 +25,4 @@ const createPost = async (req, res) => {
   });
 };
 
-module.exports = { createPost };
+module.exports = { createPost, getAllPosts };
