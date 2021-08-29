@@ -7,8 +7,10 @@ const app = express();
 const connectDB = require("./db/db.connect");
 const errorHandlerMiddleware = require("./middleware/error-handler.middleware");
 const notFoundMiddleware = require("./middleware/not-found.middleware");
+const authMiddleware = require("./middleware/auth.middleware");
 
 const authRouter = require("./routes/auth.router");
+const postsRouter = require("./routes/posts.router");
 
 app.use(express.json());
 
@@ -17,6 +19,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/posts", authMiddleware, postsRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
