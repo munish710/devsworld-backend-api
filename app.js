@@ -11,6 +11,7 @@ const authMiddleware = require("./middleware/auth.middleware");
 
 const authRouter = require("./routes/auth.router");
 const postsRouter = require("./routes/posts.router");
+const usersRouter = require("./routes/users.router");
 
 app.use(express.json());
 
@@ -20,6 +21,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/posts", authMiddleware, postsRouter);
+app.use("/api/v1/users", authMiddleware, usersRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
