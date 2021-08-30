@@ -35,4 +35,31 @@ const myPosts = async (req, res) => {
   res.status(200).json({ success: true, message: "your posts", posts });
 };
 
-module.exports = { createPost, getAllPosts, myPosts };
+const toggleLike = async (req, res) => {
+  const { postID } = req.params;
+  const { userID } = req.user;
+  let isLiked = false;
+  const foundPost = await Post.findById(postID);
+
+  if (!foundPost) {
+    throw new BadRequestError("The post doesn't exists");
+  }
+
+  let index = foundPost.likes.indexOf(userID);
+  if (index === -1) {
+    foundPost.likes.push(userID);
+    isLiked = true;
+  } else {
+    foundPost.likes.splice(index, 1);
+  }
+
+  await foundPost.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Like toggled",
+    isLiked,
+  });
+};
+
+module.exports = { createPost, getAllPosts, myPosts, toggleLike };
