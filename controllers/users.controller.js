@@ -37,7 +37,6 @@ const followUser = async (req, res) => {
   if (!userToFollow) {
     throw new BadRequestError("User you want to follow doesn't exists");
   }
-  console.log("userto follow", userToFollow);
 
   if (userToFollow.followers.indexOf(userID) != -1) {
     throw new BadRequestError("You already follow this user.");
@@ -61,4 +60,36 @@ const followUser = async (req, res) => {
     .json({ success: true, message: "Followed user successfully" });
 };
 
-module.exports = { getUserDetails, getUserPosts, followUser };
+const unfollowUser = async (req, res) => {
+  const { unfollowUserID } = req.params;
+  const { userID } = req.user;
+
+  const userToUnfollow = await User.findById(unfollowUserID);
+  if (!userToUnfollow) {
+    throw new BadRequestError("User you want to unfollow doesn't exists");
+  }
+
+  let index = userToUnfollow.followers.indexOf(userID);
+  if (index != -1) {
+    userToUnfollow.followers.splice(index, 1);
+    await userToUnfollow.save();
+  } else {
+    throw new BadRequestError("You don't follow this user.");
+  }
+
+  await User.findByIdAndUpdate(
+    userID,
+    {
+      $pull: { following: unfollowUserID },
+    },
+    {
+      new: true,
+    }
+  );
+
+  res
+    .status(200)
+    .json({ success: true, message: "Unfollowed user successfully" });
+};
+
+module.exports = { getUserDetails, getUserPosts, followUser, unfollowUser };
