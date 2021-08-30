@@ -28,6 +28,8 @@ const UserSchema = new mongoose.Schema({
     required: [true, "Please provide a Password"],
     minLength: 6,
   },
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 });
 
 module.exports = mongoose.model("User", UserSchema);
