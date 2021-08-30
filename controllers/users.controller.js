@@ -16,4 +16,17 @@ const getUserDetails = async (req, res) => {
   });
 };
 
-module.exports = { getUserDetails };
+const getUserPosts = async (req, res) => {
+  const posts = await Post.find({ postedBy: req.params.id }).populate({
+    path: "postedBy",
+    select: "_id name username",
+  });
+
+  if (!posts) {
+    throw new BadRequestError("Posts Not found");
+  }
+
+  res.status(200).json({ success: true, message: "User's posts", posts });
+};
+
+module.exports = { getUserDetails, getUserPosts };
