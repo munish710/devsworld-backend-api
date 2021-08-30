@@ -29,4 +29,36 @@ const getUserPosts = async (req, res) => {
   res.status(200).json({ success: true, message: "User's posts", posts });
 };
 
-module.exports = { getUserDetails, getUserPosts };
+const followUser = async (req, res) => {
+  const { followUserID } = req.params;
+  const { userID } = req.user;
+
+  const userToFollow = await User.findById(followUserID);
+  if (!userToFollow) {
+    throw new BadRequestError("User you want to follow doesn't exists");
+  }
+  console.log("userto follow", userToFollow);
+
+  if (userToFollow.followers.indexOf(userID) != -1) {
+    throw new BadRequestError("You already follow this user.");
+  } else {
+    userToFollow.followers.push(userID);
+    await userToFollow.save();
+  }
+
+  await User.findByIdAndUpdate(
+    userID,
+    {
+      $push: { following: followUserID },
+    },
+    {
+      new: true,
+    }
+  );
+
+  res
+    .status(200)
+    .json({ success: true, message: "Followed user successfully" });
+};
+
+module.exports = { getUserDetails, getUserPosts, followUser };
