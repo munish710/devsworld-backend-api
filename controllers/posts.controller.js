@@ -6,6 +6,7 @@ const getAllPosts = async (req, res) => {
     path: "postedBy",
     select: "_id name username",
   });
+
   res
     .status(200)
     .json({ success: true, message: "All posts", posts: allPosts });
@@ -25,4 +26,13 @@ const createPost = async (req, res) => {
   });
 };
 
-module.exports = { createPost, getAllPosts };
+const myPosts = async (req, res) => {
+  const posts = await Post.find({ postedBy: req.user.userID }).populate({
+    path: "postedBy",
+    select: "_id name username",
+  });
+
+  res.status(200).json({ success: true, message: "your posts", posts });
+};
+
+module.exports = { createPost, getAllPosts, myPosts };
