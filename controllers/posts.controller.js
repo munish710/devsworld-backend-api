@@ -62,4 +62,25 @@ const toggleLike = async (req, res) => {
   });
 };
 
-module.exports = { createPost, getAllPosts, myPosts, toggleLike };
+const addComment = async (req, res) => {
+  const { postID } = req.params;
+  const { userID } = req.user;
+  const comment = {
+    text: req.body.comment,
+    postedBy: userID,
+  };
+  const updatedPost = await Post.findByIdAndUpdate(
+    postID,
+    {
+      $push: { comments: comment },
+    },
+    { new: true }
+  ).populate({ path: "comments.postedBy", select: "_id username" });
+  res.status(200).json({
+    success: true,
+    message: "Comment added successfully",
+    post: updatedPost,
+  });
+};
+
+module.exports = { createPost, getAllPosts, myPosts, toggleLike, addComment };
