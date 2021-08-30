@@ -1,5 +1,6 @@
 const { BadRequestError, UnauthorizedError } = require("../errors");
 const Post = require("../models/post.model");
+const User = require("../models/user.model");
 
 const getAllPosts = async (req, res) => {
   const allPosts = await Post.find().populate({
@@ -107,6 +108,26 @@ const deletePost = async (req, res) => {
   }
 };
 
+const myFeed = async (req, res) => {
+  const { userID } = req.user;
+  const userDetails = await User.findById(userID);
+  const following = [...userDetails.following];
+  //if postedBy id matches id of people user follows
+  const myFeedPosts = await Post.find({ postedBy: { $in: following } })
+    .populate({ path: "postedBy", select: "_id username" })
+    .populate({ path: "comments.postedBy", select: "_id, username" })
+    .sort({ createdAt: -1 });
+
+  if (!myFeedPosts) {
+    throw new BadRequestError("No posts found");
+  }
+  res.status(200).json({
+    success: true,
+    message: "Posts by people you follow",
+    posts: myFeedPosts,
+  });
+};
+
 module.exports = {
   createPost,
   getAllPosts,
@@ -114,4 +135,5 @@ module.exports = {
   toggleLike,
   addComment,
   deletePost,
+  myFeed,
 };
