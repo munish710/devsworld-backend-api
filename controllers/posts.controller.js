@@ -1,4 +1,4 @@
-const { BadRequestError } = require("../errors");
+const { BadRequestError, UnauthorizedError } = require("../errors");
 const Post = require("../models/post.model");
 
 const getAllPosts = async (req, res) => {
@@ -76,6 +76,10 @@ const addComment = async (req, res) => {
     },
     { new: true }
   ).populate({ path: "comments.postedBy", select: "_id username" });
+
+  if (!updatedPost) {
+    throw new BadRequestError("Couldn't add your comment");
+  }
   res.status(200).json({
     success: true,
     message: "Comment added successfully",
@@ -83,4 +87,31 @@ const addComment = async (req, res) => {
   });
 };
 
-module.exports = { createPost, getAllPosts, myPosts, toggleLike, addComment };
+const deletePost = async (req, res) => {
+  const { postID } = req.params;
+  const foundPost = await Post.findById(postID).populate({
+    path: "postedBy",
+    select: "_id",
+  });
+  if (!foundPost) {
+    throw new BadRequestError("Post not found");
+  }
+
+  if (foundPost.postedBy._id.toString() === req.user.userID) {
+    await foundPost.remove();
+    res
+      .status(200)
+      .json({ success: true, message: "Successfully deleted the post" });
+  } else {
+    throw new UnauthorizedError("You are not authorized to delete this post");
+  }
+};
+
+module.exports = {
+  createPost,
+  getAllPosts,
+  myPosts,
+  toggleLike,
+  addComment,
+  deletePost,
+};
