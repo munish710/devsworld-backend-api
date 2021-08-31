@@ -119,6 +119,19 @@ const myFeed = async (req, res) => {
   });
 };
 
+const getPost = async (req, res) => {
+  const { postID } = req.params;
+  const foundPost = await Post.findById(postID)
+    .populate({ path: "postedBy", select: "_id username" })
+    .populate({ path: "comments.postedBy", select: "_id username" });
+  if (!foundPost) {
+    throw new BadRequestError("Post not found");
+  }
+  res
+    .status(200)
+    .json({ success: true, message: "Post Details", post: foundPost });
+};
+
 module.exports = {
   createPost,
   getAllPosts,
@@ -126,4 +139,5 @@ module.exports = {
   addComment,
   deletePost,
   myFeed,
+  getPost,
 };
