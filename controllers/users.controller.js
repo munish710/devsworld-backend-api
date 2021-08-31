@@ -2,6 +2,13 @@ const { BadRequestError, UnauthorizedError } = require("../errors");
 const Post = require("../models/post.model");
 const User = require("../models/user.model");
 
+const getAllUsers = async (req, res) => {
+  const allUsers = await User.find().select("_id username avatarUrl name");
+  res
+    .status(200)
+    .json({ success: true, message: "All the users from DB", users: allUsers });
+};
+
 const getUserDetails = async (req, res) => {
   const { id } = req.params;
   const foundUser = await User.findById(id).select("-password");
@@ -122,6 +129,7 @@ const updateUserDetails = async (req, res) => {
 };
 
 module.exports = {
+  getAllUsers,
   getUserDetails,
   getUserPosts,
   followUser,

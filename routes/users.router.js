@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const {
+  getAllUsers,
   getUserDetails,
   getUserPosts,
   followUser,
@@ -9,6 +10,8 @@ const {
   searchUser,
   updateUserDetails,
 } = require("../controllers/users.controller");
+
+router.route("/").get(getAllUsers);
 
 router.route("/follow/:followUserID").patch(followUser);
 router.route("/unfollow/:unfollowUserID").patch(unfollowUser);
