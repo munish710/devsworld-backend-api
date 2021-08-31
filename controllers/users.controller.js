@@ -92,4 +92,19 @@ const unfollowUser = async (req, res) => {
     .json({ success: true, message: "Unfollowed user successfully" });
 };
 
-module.exports = { getUserDetails, getUserPosts, followUser, unfollowUser };
+const searchUser = async (req, res) => {
+  const { user } = req.query;
+  const queryPattern = new RegExp("^" + user);
+  const foundUsers = await User.find({ username: { $regex: queryPattern } });
+  res
+    .status(200)
+    .json({ success: true, message: "List of users", users: foundUsers });
+};
+
+module.exports = {
+  getUserDetails,
+  getUserPosts,
+  followUser,
+  unfollowUser,
+  searchUser,
+};
