@@ -9,6 +9,7 @@ const register = async (req, res) => {
     throw new BadRequestError("Incomplete user details. Check form data");
   }
   email = email.toLowerCase();
+  username = username.toLowerCase();
   const foundUser = await User.findOne({ email });
   if (foundUser) {
     throw new BadRequestError("User already exists");
