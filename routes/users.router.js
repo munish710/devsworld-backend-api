@@ -7,13 +7,14 @@ const {
   followUser,
   unfollowUser,
   searchUser,
+  updateUserDetails,
 } = require("../controllers/users.controller");
 
 router.route("/follow/:followUserID").patch(followUser);
 router.route("/unfollow/:unfollowUserID").patch(unfollowUser);
 router.route("/search").get(searchUser);
 
-router.route("/:id").get(getUserDetails);
+router.route("/:id").get(getUserDetails).post(updateUserDetails);
 router.route("/:id/posts").get(getUserPosts);
 
 module.exports = router;

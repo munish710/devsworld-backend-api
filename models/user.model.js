@@ -32,6 +32,7 @@ const UserSchema = new mongoose.Schema(
     bio: { type: String, default: "" },
     avatarUrl: {
       type: String,
+      default: "/dummylink",
     },
     link: {
       type: String,

@@ -1,4 +1,4 @@
-const { BadRequestError } = require("../errors");
+const { BadRequestError, UnauthorizedError } = require("../errors");
 const Post = require("../models/post.model");
 const User = require("../models/user.model");
 
@@ -101,10 +101,31 @@ const searchUser = async (req, res) => {
     .json({ success: true, message: "List of users", users: foundUsers });
 };
 
+const updateUserDetails = async (req, res) => {
+  const { userID } = req.user;
+  const { id } = req.params;
+  if (userID !== id) {
+    throw new UnauthorizedError("You can't edit other user's details");
+  }
+  const { avatarUrl, name, bio, link } = req.body;
+  const userDetails = await User.findById(id).select("-password");
+  userDetails.avatarUrl = avatarUrl;
+  userDetails.name = name;
+  userDetails.bio = bio;
+  userDetails.link = link;
+  await userDetails.save();
+  res.status(201).json({
+    success: true,
+    message: "Succesfully updated user details",
+    user: userDetails,
+  });
+};
+
 module.exports = {
   getUserDetails,
   getUserPosts,
   followUser,
   unfollowUser,
   searchUser,
+  updateUserDetails,
 };
