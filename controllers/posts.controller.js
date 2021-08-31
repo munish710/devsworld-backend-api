@@ -3,10 +3,10 @@ const Post = require("../models/post.model");
 const User = require("../models/user.model");
 
 const getAllPosts = async (req, res) => {
-  const allPosts = await Post.find().populate({
-    path: "postedBy",
-    select: "_id name username",
-  });
+  const allPosts = await Post.find()
+    .populate({ path: "postedBy", select: "_id username" })
+    .populate({ path: "comments.postedBy", select: "_id, username" })
+    .sort({ createdAt: -1 });
 
   res
     .status(200)
