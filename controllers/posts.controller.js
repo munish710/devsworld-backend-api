@@ -132,6 +132,37 @@ const getPost = async (req, res) => {
     .json({ success: true, message: "Post Details", post: foundPost });
 };
 
+const deleteComment = async (req, res) => {
+  const { userID } = req.user;
+  const { postID } = req.params;
+  const { commentID } = req.body;
+  const foundPost = await Post.findById(postID);
+  if (!foundPost) {
+    throw new BadRequestError("Incorrect post ID");
+  }
+  let deleteCommentIndex = -1;
+  foundPost.comments.forEach((comment, index) => {
+    if (
+      comment.postedBy._id.toString() === userID &&
+      comment._id.toString() === commentID
+    ) {
+      deleteCommentIndex = index;
+    }
+  });
+
+  if (deleteCommentIndex != -1) {
+    foundPost.comments.splice(deleteCommentIndex, 1);
+    await foundPost.save();
+    res.status(200).json({
+      success: true,
+      message: "Comment deleted successfully",
+      post: foundPost,
+    });
+  } else {
+    throw new UnauthorizedError("You cannot delete this comment");
+  }
+};
+
 module.exports = {
   createPost,
   getAllPosts,
@@ -140,4 +171,5 @@ module.exports = {
   deletePost,
   myFeed,
   getPost,
+  deleteComment,
 };
