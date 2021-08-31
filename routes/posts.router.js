@@ -4,7 +4,6 @@ const router = express.Router();
 const {
   createPost,
   getAllPosts,
-  myPosts,
   toggleLike,
   addComment,
   deletePost,
@@ -14,7 +13,6 @@ const {
 router.route("/").get(getAllPosts).post(createPost);
 
 router.route("/myfeed").get(myFeed);
-router.route("/myposts").get(myPosts);
 
 router.route("/:postID").delete(deletePost);
 router.route("/:postID/toggle-like").patch(toggleLike);

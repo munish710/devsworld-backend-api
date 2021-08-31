@@ -27,15 +27,6 @@ const createPost = async (req, res) => {
   });
 };
 
-const myPosts = async (req, res) => {
-  const posts = await Post.find({ postedBy: req.user.userID }).populate({
-    path: "postedBy",
-    select: "_id name username",
-  });
-
-  res.status(200).json({ success: true, message: "your posts", posts });
-};
-
 const toggleLike = async (req, res) => {
   const { postID } = req.params;
   const { userID } = req.user;
@@ -131,7 +122,6 @@ const myFeed = async (req, res) => {
 module.exports = {
   createPost,
   getAllPosts,
-  myPosts,
   toggleLike,
   addComment,
   deletePost,
