@@ -5,7 +5,7 @@ const User = require("../models/user.model");
 const getAllPosts = async (req, res) => {
   const allPosts = await Post.find()
     .populate({ path: "postedBy", select: "_id username" })
-    .populate({ path: "comments.postedBy", select: "_id, username" })
+    .populate({ path: "comments.postedBy", select: "_id username" })
     .sort({ createdAt: -1 });
 
   res
@@ -115,7 +115,7 @@ const myFeed = async (req, res) => {
   //if postedBy id matches id of people user follows
   const myFeedPosts = await Post.find({ postedBy: { $in: following } })
     .populate({ path: "postedBy", select: "_id username" })
-    .populate({ path: "comments.postedBy", select: "_id, username" })
+    .populate({ path: "comments.postedBy", select: "_id username" })
     .sort({ createdAt: -1 });
 
   if (!myFeedPosts) {
