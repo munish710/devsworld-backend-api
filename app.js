@@ -17,6 +17,11 @@ const authRouter = require("./routes/auth.router");
 const postsRouter = require("./routes/posts.router");
 const usersRouter = require("./routes/users.router");
 
+const corsOptions = {
+  origin: "http://localhost:3000",
+  optionsSuccessStatus: 200,
+};
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(helmet());
