@@ -25,7 +25,6 @@ const register = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "User created successfully",
-      // user: newUser,
     });
   }
 };
@@ -54,9 +53,16 @@ const login = async (req, res) => {
     }
   );
 
-  return res
-    .status(200)
-    .json({ success: true, message: "Successfully logged in", token });
+  return res.status(200).json({
+    success: true,
+    message: "Successfully logged in",
+    user: {
+      userID: foundUser._id,
+      name: foundUser.name,
+      username: foundUser.username,
+      avatarUrl: foundUser.avatarUrl,
+    },
+  });
 };
 
 module.exports = { register, login };
