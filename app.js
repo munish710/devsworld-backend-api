@@ -18,14 +18,14 @@ const postsRouter = require("./routes/posts.router");
 const usersRouter = require("./routes/users.router");
 
 const corsOptions = {
-  origin: "http://localhost:3000",
+  origin: ["http://localhost:3000", "https://devs-world.netlify.app"],
   optionsSuccessStatus: 200,
 };
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(helmet());
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(xss());
 app.use(rateLimiter({ windowMs: 60 * 1000, max: 60 }));
 
