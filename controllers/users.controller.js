@@ -11,7 +11,10 @@ const getAllUsers = async (req, res) => {
 
 const getUserDetails = async (req, res) => {
   const { id } = req.params;
-  const foundUser = await User.findById(id).select("-password");
+  const foundUser = await User.findById(id)
+    .select("-password")
+    .populate({ path: "followers", select: "_id username avatarUrl name" })
+    .populate({ path: "following", select: "_id username avatarUrl name" });
   if (!foundUser) {
     throw new BadRequestError("User not found");
   }
@@ -24,10 +27,12 @@ const getUserDetails = async (req, res) => {
 };
 
 const getUserPosts = async (req, res) => {
-  const posts = await Post.find({ postedBy: req.params.id }).populate({
-    path: "postedBy",
-    select: "_id name username",
-  });
+  const posts = await Post.find({ postedBy: req.params.id })
+    .populate({
+      path: "postedBy",
+      select: "_id name username avatarUrl",
+    })
+    .sort({ createdAt: -1 });
 
   if (!posts) {
     throw new BadRequestError("Posts Not found");
@@ -62,9 +67,16 @@ const followUser = async (req, res) => {
     }
   );
 
-  res
-    .status(200)
-    .json({ success: true, message: "Followed user successfully" });
+  const updatedUser = await User.findById(followUserID)
+    .select("-password")
+    .populate({ path: "followers", select: "_id username avatarUrl name" })
+    .populate({ path: "following", select: "_id username avatarUrl name" });
+
+  res.status(200).json({
+    success: true,
+    message: "Followed user successfully",
+    user: updatedUser,
+  });
 };
 
 const unfollowUser = async (req, res) => {
@@ -94,15 +106,24 @@ const unfollowUser = async (req, res) => {
     }
   );
 
-  res
-    .status(200)
-    .json({ success: true, message: "Unfollowed user successfully" });
+  const updatedUser = await User.findById(unfollowUserID)
+    .select("-password")
+    .populate({ path: "followers", select: "_id username avatarUrl name" })
+    .populate({ path: "following", select: "_id username avatarUrl name" });
+
+  res.status(200).json({
+    success: true,
+    message: "Unfollowed user successfully",
+    user: updatedUser,
+  });
 };
 
 const searchUser = async (req, res) => {
   const { user } = req.query;
   const queryPattern = new RegExp("^" + user);
-  const foundUsers = await User.find({ username: { $regex: queryPattern } });
+  const foundUsers = await User.find({
+    username: { $regex: queryPattern },
+  }).select("_id username avatarUrl name");
   res
     .status(200)
     .json({ success: true, message: "List of users", users: foundUsers });
