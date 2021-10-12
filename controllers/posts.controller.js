@@ -4,8 +4,11 @@ const User = require("../models/user.model");
 
 const getAllPosts = async (req, res) => {
   const allPosts = await Post.find()
-    .populate({ path: "postedBy", select: "_id username" })
-    .populate({ path: "comments.postedBy", select: "_id username" })
+    .populate({ path: "postedBy", select: "_id username avatarUrl name" })
+    .populate({
+      path: "comments.postedBy",
+      select: "_id username avatarUrl name",
+    })
     .sort({ createdAt: -1 });
 
   res
@@ -18,12 +21,28 @@ const createPost = async (req, res) => {
   if (!title || !body) {
     throw new BadRequestError("Please add all the fields");
   }
-  const newPost = new Post({ title, body, postedBy: req.user.userID });
+  const newPost = new Post({
+    title,
+    body,
+    postedBy: req.user.userID,
+    imageUrl: req.body.imageUrl ?? "",
+  });
   const savedPost = await newPost.save();
+  let fullPost = await savedPost.populate([
+    {
+      path: "postedBy",
+      select: "_id username avatarUrl name",
+    },
+    {
+      path: "comments.postedBy",
+      select: "_id username avatarUrl name",
+    },
+  ]);
+
   res.status(201).json({
     success: true,
     message: "Post created Successfully",
-    post: savedPost,
+    post: fullPost,
   });
 };
 
@@ -67,7 +86,12 @@ const addComment = async (req, res) => {
       $push: { comments: comment },
     },
     { new: true }
-  ).populate({ path: "comments.postedBy", select: "_id username" });
+  )
+    .populate({ path: "postedBy", select: "_id username avatarUrl name" })
+    .populate({
+      path: "comments.postedBy",
+      select: "_id username avatarUrl name",
+    });
 
   if (!updatedPost) {
     throw new BadRequestError("Couldn't add your comment");
@@ -102,12 +126,17 @@ const deletePost = async (req, res) => {
 const myFeed = async (req, res) => {
   const { userID } = req.user;
   const userDetails = await User.findById(userID);
-  const following = [...userDetails.following];
+  const feedUsers = [...userDetails.following, userID];
   //if postedBy id matches id of people user follows
-  const myFeedPosts = await Post.find({ postedBy: { $in: following } })
-    .populate({ path: "postedBy", select: "_id username" })
-    .populate({ path: "comments.postedBy", select: "_id username" })
+  const myFeedPosts = await Post.find({ postedBy: { $in: feedUsers } })
+    .populate({ path: "postedBy", select: "_id username avatarUrl name" })
+    .populate({
+      path: "comments.postedBy",
+      select: "_id username avatarUrl name",
+    })
     .sort({ createdAt: -1 });
+
+  //might have to comment out below code.
 
   if (!myFeedPosts) {
     throw new BadRequestError("No posts found");
@@ -122,8 +151,11 @@ const myFeed = async (req, res) => {
 const getPost = async (req, res) => {
   const { postID } = req.params;
   const foundPost = await Post.findById(postID)
-    .populate({ path: "postedBy", select: "_id username" })
-    .populate({ path: "comments.postedBy", select: "_id username" });
+    .populate({ path: "postedBy", select: "_id username avatarUrl name" })
+    .populate({
+      path: "comments.postedBy",
+      select: "_id username avatarUrl name",
+    });
   if (!foundPost) {
     throw new BadRequestError("Post not found");
   }
@@ -159,7 +191,7 @@ const deleteComment = async (req, res) => {
       post: foundPost,
     });
   } else {
-    throw new UnauthorizedError("You cannot delete this comment");
+    throw new BadRequestError("You cannot delete this comment");
   }
 };
 

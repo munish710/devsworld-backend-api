@@ -18,6 +18,6 @@ router.route("/myfeed").get(myFeed);
 
 router.route("/:postID").get(getPost).delete(deletePost);
 router.route("/:postID/toggle-like").patch(toggleLike);
-router.route("/:postID/comment").patch(addComment).delete(deleteComment);
+router.route("/:postID/comment").patch(addComment).post(deleteComment);
 
 module.exports = router;
