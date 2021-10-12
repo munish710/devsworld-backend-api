@@ -61,6 +61,7 @@ const login = async (req, res) => {
       name: foundUser.name,
       username: foundUser.username,
       avatarUrl: foundUser.avatarUrl,
+      token,
     },
   });
 };
