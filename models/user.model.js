@@ -32,7 +32,8 @@ const UserSchema = new mongoose.Schema(
     bio: { type: String, default: "" },
     avatarUrl: {
       type: String,
-      default: "/dummylink",
+      default:
+        "https://res.cloudinary.com/munish-cloud/image/upload/v1633378162/user9_oruatz.jpg",
     },
     link: {
       type: String,
