@@ -32,6 +32,10 @@ const getUserPosts = async (req, res) => {
       path: "postedBy",
       select: "_id name username avatarUrl",
     })
+    .populate({
+      path: "comments.postedBy",
+      select: "_id username avatarUrl name",
+    })
     .sort({ createdAt: -1 });
 
   if (!posts) {
@@ -142,10 +146,16 @@ const updateUserDetails = async (req, res) => {
   userDetails.bio = bio;
   userDetails.link = link;
   await userDetails.save();
+
+  const updatedUser = await User.findById(id)
+    .select("-password")
+    .populate({ path: "followers", select: "_id username avatarUrl name" })
+    .populate({ path: "following", select: "_id username avatarUrl name" });
+
   res.status(201).json({
     success: true,
     message: "Succesfully updated user details",
-    user: userDetails,
+    user: updatedUser,
   });
 };
 
