@@ -185,10 +185,22 @@ const deleteComment = async (req, res) => {
   if (deleteCommentIndex != -1) {
     foundPost.comments.splice(deleteCommentIndex, 1);
     await foundPost.save();
+
+    let fullPost = await foundPost.populate([
+      {
+        path: "postedBy",
+        select: "_id username avatarUrl name",
+      },
+      {
+        path: "comments.postedBy",
+        select: "_id username avatarUrl name",
+      },
+    ]);
+
     res.status(200).json({
       success: true,
       message: "Comment deleted successfully",
-      post: foundPost,
+      post: fullPost,
     });
   } else {
     throw new BadRequestError("You cannot delete this comment");
