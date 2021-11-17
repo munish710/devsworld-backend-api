@@ -124,7 +124,7 @@ const unfollowUser = async (req, res) => {
 
 const searchUser = async (req, res) => {
   const { user } = req.query;
-  const queryPattern = new RegExp("^" + user);
+  const queryPattern = new RegExp("^" + user.toLowerCase());
   const foundUsers = await User.find({
     username: { $regex: queryPattern },
   }).select("_id username avatarUrl name");
